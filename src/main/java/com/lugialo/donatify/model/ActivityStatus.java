@@ -1,8 +1,7 @@
 package com.lugialo.donatify.model;
 
 public enum ActivityStatus {
-    ENROLLED,
+    ACTIVE,
     COMPLETED,
-    CANCELED_BY_USER,
-    PENDING_APPROVAL
+    CANCELED
 }
