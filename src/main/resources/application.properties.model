@@ -1,0 +1,18 @@
+# Remova a extensão .model deste arquivo antes de usar
+spring.application.name=donatify
+
+server.port=8080
+
+spring.datasource.url={url do banco de dados PostgreSQL}
+spring.datasource.username={usuário do banco de dados PostgreSQL}
+spring.datasource.password={senha do banco de dados PostgreSQL}
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+# Use 'none' for production to avoid schema generation
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+app.jwtSecret={token JWT secreto}
+app.jwtExpirationInMs={duração do token JWT em segundos}
