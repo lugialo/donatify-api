@@ -5,6 +5,7 @@ import com.lugialo.donatify.dto.UserResponseDto;
 import com.lugialo.donatify.model.User;
 import com.lugialo.donatify.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,11 +15,13 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository)
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder)
     {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -33,7 +36,7 @@ public class UserServiceImpl implements UserService{
         User newUser = new User();
         newUser.setName(registrationDto.getName());
         newUser.setEmail(registrationDto.getEmail());
-        newUser.setPassword(registrationDto.getPassword());
+        newUser.setPassword(passwordEncoder.encode(registrationDto.getPassword())); // Hash da senha
         newUser.setPhone(registrationDto.getPhone());
         newUser.setAddress(registrationDto.getAddress());
         // totalPoints é inicializado como 0 por padrão
