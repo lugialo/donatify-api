@@ -13,7 +13,7 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
     long countByUser_IdAndStatus(Long userId, EnrollmentStatus status);
 
     // Busca as últimas inscrições de um usuário
-    List<Enrollment> findTop5ByUser_IdOrderByEnrollmentDateDesc(Long userId, EnrollmentStatus status);
+    List<Enrollment> findTop5ByUser_IdOrderByEnrollmentDateDesc(Long userId);
 
     // Verifica se um usuário já está inscrito em uma atividade
     boolean existsByUser_IdAndActivity_Id(Long userId, Long activityId);
