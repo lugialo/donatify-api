@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "enrollments")
 @Data
 public class Enrollment {
 
