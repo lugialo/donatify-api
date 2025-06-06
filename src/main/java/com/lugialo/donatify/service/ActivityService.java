@@ -24,7 +24,7 @@ public class ActivityService {
 
     // Retorna todas as atividades disponíveis (ativas)
     @Transactional(readOnly = true)
-    public List<ActivityResponseDto> getAvailableActivites() {
+    public List<ActivityResponseDto> getAvailableActivities() {
         return activityRepository.findByStatus(ActivityStatus.ACTIVE).stream()
                 .map(ActivityResponseDto::fromEntity)
                 .collect(Collectors.toList());
@@ -34,7 +34,7 @@ public class ActivityService {
     @Transactional
     public void enrollUserInActivity(Long userId, Long activityId) {
         if (enrollmentRepository.existsByUser_IdAndActivity_Id(userId, activityId)) {
-            throw new IllegalArgumentException("Usuário já está inscrito nesta atividade.");
+            throw new IllegalStateException("Usuário já está inscrito nesta atividade.");
         }
 
         User user = userRepository.findById(userId)
@@ -43,7 +43,7 @@ public class ActivityService {
                 .orElseThrow(() -> new IllegalArgumentException("Atividade não encontrada."));
 
         if (activity.getStatus() != ActivityStatus.ACTIVE) {
-            throw new IllegalArgumentException("Atividade não está ativa.");
+            throw new IllegalStateException("Esta atividade não está ativa.");
         }
 
         Enrollment enrollment = new Enrollment();
@@ -52,6 +52,5 @@ public class ActivityService {
         enrollment.setStatus(EnrollmentStatus.ENROLLED);
 
         enrollmentRepository.save(enrollment);
-
     }
 }

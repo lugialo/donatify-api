@@ -1,6 +1,5 @@
 package com.lugialo.donatify.model;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -26,7 +25,7 @@ public class Activity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    public ActivityType activityType;
+    public ActivityType type;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

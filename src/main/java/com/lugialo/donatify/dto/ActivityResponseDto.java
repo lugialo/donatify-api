@@ -22,7 +22,7 @@ public class ActivityResponseDto {
         dto.setTitle(activity.getTitle());
         dto.setDescription(activity.getDescription());
         dto.setPointsValue(activity.getPointsValue());
-        dto.setType(activity.getActivityType().name().toLowerCase());
+        dto.setType(activity.getType().name().toLowerCase());
         dto.setStatus(activity.getStatus().name().toLowerCase());
         dto.setStartDate(activity.getStartDate());
         dto.setEndDate(activity.getEndDate());
