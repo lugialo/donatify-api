@@ -1,5 +1,6 @@
 package com.lugialo.donatify.model;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -25,7 +26,7 @@ public class Activity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ActivityType activityType;
+    public ActivityType activityType;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -46,4 +47,5 @@ public class Activity {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
+
 }
