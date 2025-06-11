@@ -9,6 +9,9 @@ public class UserResponseDto {
     private long id;
     private String name;
     private String email;
+    private String nickname;
+    private String role;
+    private String ongName;
     private String phone;
     private String address;
     private int totalPoints;
@@ -19,6 +22,11 @@ public class UserResponseDto {
         dto.setId(user.getId());
         dto.setName(user.getName());
         dto.setEmail(user.getEmail());
+        dto.setNickname(user.getNickname());
+        dto.setRole(user.getRole().name());
+        if (user.getOng() != null) {
+            dto.setOngName(user.getOng().getName());
+        }
         dto.setPhone(user.getPhone());
         dto.setAddress(user.getAddress());
         dto.setTotalPoints(user.getTotalPoints());

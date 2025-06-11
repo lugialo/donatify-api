@@ -27,6 +27,17 @@ public class User {
     @Column(nullable = false)
     private String name;
 
+    @Column(unique = true)
+    private String nickname;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role = Role.USER;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ong_id")
+    private Ong ong;
+
     private String phone;
 
     @Column(columnDefinition = "TEXT")

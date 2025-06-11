@@ -2,7 +2,10 @@ package com.lugialo.donatify.service;
 
 import com.lugialo.donatify.dto.UserRegistrationDto;
 import com.lugialo.donatify.dto.UserResponseDto;
+import com.lugialo.donatify.model.Ong;
+import com.lugialo.donatify.model.Role;
 import com.lugialo.donatify.model.User;
+import com.lugialo.donatify.repository.OngRepository;
 import com.lugialo.donatify.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,13 +18,15 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
+    private final OngRepository ongRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder)
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, OngRepository ongRepository)
     {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.ongRepository = ongRepository;
     }
 
     @Override
@@ -37,6 +42,14 @@ public class UserServiceImpl implements UserService{
         newUser.setName(registrationDto.getName());
         newUser.setEmail(registrationDto.getEmail());
         newUser.setPassword(passwordEncoder.encode(registrationDto.getPassword())); // Hash da senha
+        newUser.setNickname(registrationDto.getNickname());
+        newUser.setRole(Role.USER);
+        // Associa a ONG se um ID for fornecido
+        if (registrationDto.getOngId() != null) {
+            Ong ong = ongRepository.findById(registrationDto.getOngId())
+                    .orElseThrow(() -> new IllegalArgumentException("ONG com ID " + registrationDto.getOngId() + " não encontrada."));
+            newUser.setOng(ong);
+        }
         newUser.setPhone(registrationDto.getPhone());
         newUser.setAddress(registrationDto.getAddress());
         // totalPoints é inicializado como 0 por padrão

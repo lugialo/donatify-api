@@ -81,18 +81,6 @@
 			<artifactId>jjwt-jackson</artifactId> <version>0.12.3</version> <scope>runtime</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>com.google.cloud</groupId>
-			<artifactId>spring-cloud-gcp-dependencies</artifactId>
-			<version>6.2.1</version>
-			<type>pom</type>
-		</dependency>
-
-		<dependency>
-			<groupId>com.google.cloud</groupId>
-			<artifactId>spring-cloud-gcp-starter-sql-postgresql</artifactId>
-			<version>6.2.1</version>
-		</dependency>
 	</dependencies>
 
 	<build>
