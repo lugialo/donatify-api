@@ -2,6 +2,7 @@ package com.lugialo.donatify.service;
 
 import com.lugialo.donatify.model.User;
 import com.lugialo.donatify.repository.UserRepository;
+import com.lugialo.donatify.util.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -23,10 +24,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado com o email: " + email));
 
-        return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
-                user.getPassword(),
-                new ArrayList<>()
-        );
+        return UserPrincipal.create(user);
     }
 }

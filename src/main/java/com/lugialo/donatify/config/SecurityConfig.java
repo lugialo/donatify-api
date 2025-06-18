@@ -50,7 +50,14 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/api/auth/**").permitAll() // Permite acesso a endpoints de autenticação)
                         .requestMatchers("/api/users/register").permitAll() // Permite registro de usuários
-                        .anyRequest().authenticated() // Requer autenticação para qualquer outra requisição
+                        .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
+
+                        .requestMatchers("/api/activities/**").authenticated()
+                        .requestMatchers("/api/enrollments/**").authenticated()
+                        .requestMatchers("/api/dashboard").authenticated()
+                        .requestMatchers("/api/ranking").authenticated()
+
+                        .anyRequest().authenticated()
                 );
 
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);

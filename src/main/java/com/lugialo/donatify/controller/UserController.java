@@ -1,12 +1,16 @@
 package com.lugialo.donatify.controller;
 
+import com.lugialo.donatify.dto.UserProfileUpdateDto;
 import com.lugialo.donatify.dto.UserRegistrationDto;
 import com.lugialo.donatify.dto.UserResponseDto;
 import com.lugialo.donatify.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+
 
 @RestController
 @RequestMapping("/api/users")
@@ -42,5 +46,27 @@ public class UserController {
         return userService.getUserByEmail(email)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/me")
+    public ResponseEntity<?> updateUserProfile(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody UserProfileUpdateDto updateDto) {
+
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Acesso negado.");
+        }
+
+        try {
+            // Passa o email do usuário (vindo do token) e os dados de atualização para o serviço
+            UserResponseDto updatedUser = userService.updateUserProfile(userDetails.getUsername(), updateDto);
+            return ResponseEntity.ok(updatedUser);
+        } catch (IllegalArgumentException e) {
+            // Captura erros de validação (ex: senha atual incorreta)
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            // Captura outros erros inesperados
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao atualizar o perfil.");
+        }
     }
 }

@@ -1,5 +1,7 @@
 package com.lugialo.donatify.service;
 
+import com.lugialo.donatify.dto.AdminUserUpdateDto;
+import com.lugialo.donatify.dto.UserProfileUpdateDto;
 import com.lugialo.donatify.dto.UserRegistrationDto;
 import com.lugialo.donatify.dto.UserResponseDto;
 import com.lugialo.donatify.model.Ong;
@@ -12,7 +14,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -60,6 +64,13 @@ public class UserServiceImpl implements UserService{
 
     @Override
     @Transactional(readOnly = true)
+    public User findUserEntityByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado com email: " + email));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<UserResponseDto> getUserById(long userId)
     {
         return userRepository.findById(userId)
@@ -88,6 +99,85 @@ public class UserServiceImpl implements UserService{
         User user = getUserEntityById(userId);
         user.setTotalPoints(user.getTotalPoints() + pointsToAdd);
         userRepository.save(user);
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<UserResponseDto> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(UserResponseDto::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public UserResponseDto updateUserByAdmin(Long userId, AdminUserUpdateDto updateDto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário com ID " + userId + " não encontrado."));
+
+        user.setName(updateDto.getName());
+        user.setNickname(updateDto.getNickname());
+        user.setEmail(updateDto.getEmail());
+        user.setRole(updateDto.getRole());
+
+        if (updateDto.getOngId() != null) {
+            Ong ong = ongRepository.findById(updateDto.getOngId())
+                    .orElseThrow(() -> new IllegalArgumentException("ONG com ID " + updateDto.getOngId() + " não encontrada."));
+            user.setOng(ong);
+        } else {
+            user.setOng(null); // Permite desassociar de uma ONG
+        }
+
+        User updatedUser = userRepository.save(user);
+        return UserResponseDto.fromEntity(updatedUser);
+    }
+
+    @Transactional
+    public void deleteUser(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new IllegalArgumentException("Usuário com ID " + userId + " não encontrado.");
+        }
+        userRepository.deleteById(userId);
+    }
+
+    @Override
+    @Transactional
+    public UserResponseDto updateUserProfile(String userEmail, UserProfileUpdateDto updateDto) {
+        // Busca o usuário pelo email do token, garantindo que ele só pode editar a si mesmo.
+        User user = findUserEntityByEmail(userEmail);
+
+        // Atualiza os campos básicos se eles foram fornecidos no DTO
+        if (updateDto.getName() != null && !updateDto.getName().isEmpty()) {
+            user.setName(updateDto.getName());
+        }
+        if (updateDto.getNickname() != null && !updateDto.getNickname().isEmpty()) {
+            // Adicionar verificação se o novo nickname já não está em uso por outra pessoa
+            user.setNickname(updateDto.getNickname());
+        }
+        if (updateDto.getPhone() != null) {
+            user.setPhone(updateDto.getPhone());
+        }
+        if (updateDto.getAddress() != null) {
+            user.setAddress(updateDto.getAddress());
+        }
+
+        // Lógica para alteração de senha
+        if (updateDto.getNewPassword() != null && !updateDto.getNewPassword().isEmpty()) {
+            // Se o usuário quer mudar a senha, ele DEVE fornecer a senha atual.
+            if (updateDto.getCurrentPassword() == null || updateDto.getCurrentPassword().isEmpty()) {
+                throw new IllegalArgumentException("Para definir uma nova senha, a senha atual é necessária.");
+            }
+
+            // Verifica se a senha atual fornecida corresponde à senha no banco de dados.
+            if (!passwordEncoder.matches(updateDto.getCurrentPassword(), user.getPassword())) {
+                throw new IllegalArgumentException("A senha atual está incorreta.");
+            }
+
+            // Se tudo estiver correto, atualiza para a nova senha (hasheada).
+            user.setPassword(passwordEncoder.encode(updateDto.getNewPassword()));
+        }
+
+        User updatedUser = userRepository.save(user);
+        return UserResponseDto.fromEntity(updatedUser);
     }
 
 
