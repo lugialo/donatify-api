@@ -42,6 +42,10 @@ public class Activity {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ong_id", nullable = false)
+    private Ong ong;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();

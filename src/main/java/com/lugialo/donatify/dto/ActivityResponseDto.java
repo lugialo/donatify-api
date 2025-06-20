@@ -15,6 +15,8 @@ public class ActivityResponseDto {
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private String location;
+    private Long ongId;
+    private String ongName;
 
     public static ActivityResponseDto fromEntity(Activity activity) {
         ActivityResponseDto dto = new ActivityResponseDto();
@@ -27,6 +29,11 @@ public class ActivityResponseDto {
         dto.setStartDate(activity.getStartDate());
         dto.setEndDate(activity.getEndDate());
         dto.setLocation(activity.getLocation());
+
+        if (activity.getOng() != null) {
+            dto.setOngId(activity.getOng().getId());
+            dto.setOngName(activity.getOng().getName());
+        }
 
         return dto;
     }

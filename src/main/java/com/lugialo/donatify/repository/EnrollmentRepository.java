@@ -18,4 +18,6 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
     // Verifica se um usuário já está inscrito em uma atividade
     boolean existsByUser_IdAndActivity_Id(Long userId, Long activityId);
 
+    List<Enrollment> findByStatus(EnrollmentStatus status);
+
 }

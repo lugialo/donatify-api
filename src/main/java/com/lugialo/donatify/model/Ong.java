@@ -17,5 +17,5 @@ public class Ong {
     private String name;
 
     @OneToMany(mappedBy = "ong")
-    private List<User> users;
+    private List<Activity> activities;
 }

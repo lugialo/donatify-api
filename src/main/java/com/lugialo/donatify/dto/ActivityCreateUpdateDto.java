@@ -14,5 +14,6 @@ public class ActivityCreateUpdateDto {
     private ActivityStatus status;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
+    private Long ongId;
     private String location;
 }

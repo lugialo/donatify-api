@@ -4,7 +4,6 @@ import com.lugialo.donatify.dto.AdminUserUpdateDto;
 import com.lugialo.donatify.dto.UserProfileUpdateDto;
 import com.lugialo.donatify.dto.UserRegistrationDto;
 import com.lugialo.donatify.dto.UserResponseDto;
-import com.lugialo.donatify.model.Ong;
 import com.lugialo.donatify.model.Role;
 import com.lugialo.donatify.model.User;
 import com.lugialo.donatify.repository.OngRepository;
@@ -22,7 +21,6 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
-    private final OngRepository ongRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -30,7 +28,6 @@ public class UserServiceImpl implements UserService{
     {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.ongRepository = ongRepository;
     }
 
     @Override
@@ -48,12 +45,7 @@ public class UserServiceImpl implements UserService{
         newUser.setPassword(passwordEncoder.encode(registrationDto.getPassword())); // Hash da senha
         newUser.setNickname(registrationDto.getNickname());
         newUser.setRole(Role.USER);
-        // Associa a ONG se um ID for fornecido
-        if (registrationDto.getOngId() != null) {
-            Ong ong = ongRepository.findById(registrationDto.getOngId())
-                    .orElseThrow(() -> new IllegalArgumentException("ONG com ID " + registrationDto.getOngId() + " não encontrada."));
-            newUser.setOng(ong);
-        }
+
         newUser.setPhone(registrationDto.getPhone());
         newUser.setAddress(registrationDto.getAddress());
         // totalPoints é inicializado como 0 por padrão
@@ -118,14 +110,6 @@ public class UserServiceImpl implements UserService{
         user.setNickname(updateDto.getNickname());
         user.setEmail(updateDto.getEmail());
         user.setRole(updateDto.getRole());
-
-        if (updateDto.getOngId() != null) {
-            Ong ong = ongRepository.findById(updateDto.getOngId())
-                    .orElseThrow(() -> new IllegalArgumentException("ONG com ID " + updateDto.getOngId() + " não encontrada."));
-            user.setOng(ong);
-        } else {
-            user.setOng(null); // Permite desassociar de uma ONG
-        }
 
         User updatedUser = userRepository.save(user);
         return UserResponseDto.fromEntity(updatedUser);

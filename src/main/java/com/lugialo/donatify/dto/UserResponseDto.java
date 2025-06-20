@@ -24,9 +24,6 @@ public class UserResponseDto {
         dto.setEmail(user.getEmail());
         dto.setNickname(user.getNickname());
         dto.setRole(user.getRole().name());
-        if (user.getOng() != null) {
-            dto.setOngName(user.getOng().getName());
-        }
         dto.setPhone(user.getPhone());
         dto.setAddress(user.getAddress());
         dto.setTotalPoints(user.getTotalPoints());

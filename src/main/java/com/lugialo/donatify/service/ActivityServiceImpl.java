@@ -2,17 +2,16 @@ package com.lugialo.donatify.service;
 
 import com.lugialo.donatify.dto.ActivityCreateUpdateDto;
 import com.lugialo.donatify.dto.ActivityResponseDto;
-import com.lugialo.donatify.model.Activity;
-import com.lugialo.donatify.model.ActivityStatus;
-import com.lugialo.donatify.model.Enrollment;
-import com.lugialo.donatify.model.User;
+import com.lugialo.donatify.model.*;
 import com.lugialo.donatify.repository.ActivityRepository;
 import com.lugialo.donatify.repository.EnrollmentRepository;
+import com.lugialo.donatify.repository.OngRepository;
 import com.lugialo.donatify.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,6 +27,9 @@ public class ActivityServiceImpl implements ActivityService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private OngRepository ongRepository;
+
     // --- Métodos de Usuário Comum (já existentes) ---
 
     @Override
@@ -41,8 +43,39 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     @Transactional
     public void enrollUserInActivity(Long userId, Long activityId) {
-        // ... (lógica existente)
+        // 1. Verifica se o usuário já está inscrito para evitar duplicatas
+        if (enrollmentRepository.existsByUser_IdAndActivity_Id(userId, activityId)) {
+            throw new IllegalStateException("Você já está inscrito nesta atividade.");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
+
+        Activity activity = activityRepository.findById(activityId)
+                .orElseThrow(() -> new IllegalArgumentException("Atividade não encontrada."));
+
+
+        // 2. Verifica se a atividade não foi cancelada ou encerrada.
+        if (activity.getStatus() != ActivityStatus.ACTIVE) {
+            throw new IllegalStateException("Não é possível se inscrever em uma atividade que não está ativa.");
+        }
+
+        // 3. Verifica se a data de início da atividade já passou.
+        // Consideramos a data de início como o prazo final para inscrição.
+        if (activity.getStartDate().isBefore(LocalDateTime.now())) {
+            throw new IllegalStateException("O prazo de inscrição para esta atividade já encerrou.");
+        }
+
+
+        // Se todas as verificações passarem, cria a inscrição.
+        Enrollment enrollment = new Enrollment();
+        enrollment.setUser(user);
+        enrollment.setActivity(activity);
+        enrollment.setStatus(EnrollmentStatus.ENROLLED);
+
+        enrollmentRepository.save(enrollment);
     }
+
 
 
     // --- MÉTODOS DE ADMINISTRADOR ---
@@ -50,6 +83,10 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     @Transactional
     public ActivityResponseDto createActivity(ActivityCreateUpdateDto createDto) {
+
+        Ong ong = ongRepository.findById(createDto.getOngId())
+                .orElseThrow(() -> new IllegalArgumentException("ONG com ID " + createDto.getOngId() + " não encontrada."));
+
         Activity activity = new Activity();
         // Mapeia os dados do DTO para a nova entidade
         activity.setTitle(createDto.getTitle());
@@ -60,6 +97,7 @@ public class ActivityServiceImpl implements ActivityService {
         activity.setStartDate(createDto.getStartDate());
         activity.setEndDate(createDto.getEndDate());
         activity.setLocation(createDto.getLocation());
+        activity.setOng(ong);
 
         Activity savedActivity = activityRepository.save(activity);
         return ActivityResponseDto.fromEntity(savedActivity);
@@ -88,6 +126,9 @@ public class ActivityServiceImpl implements ActivityService {
         Activity activityToUpdate = activityRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Atividade com ID " + id + " não encontrada."));
 
+        Ong ong = ongRepository.findById(updateDto.getOngId())
+                .orElseThrow(() -> new IllegalArgumentException("ONG com ID " + updateDto.getOngId() + " não encontrada."));
+
         // Atualiza a entidade com os dados do DTO
         activityToUpdate.setTitle(updateDto.getTitle());
         activityToUpdate.setDescription(updateDto.getDescription());
@@ -97,6 +138,7 @@ public class ActivityServiceImpl implements ActivityService {
         activityToUpdate.setStartDate(updateDto.getStartDate());
         activityToUpdate.setEndDate(updateDto.getEndDate());
         activityToUpdate.setLocation(updateDto.getLocation());
+        activityToUpdate.setOng(ong);
 
         Activity updatedActivity = activityRepository.save(activityToUpdate);
         return ActivityResponseDto.fromEntity(updatedActivity);
