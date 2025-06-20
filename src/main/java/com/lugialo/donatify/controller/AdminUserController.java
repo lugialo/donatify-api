@@ -20,7 +20,7 @@ public class AdminUserController {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody AdminUserUpdateDto updateDto) {
         try {
             UserResponseDto updatedUser = userService.updateUserByAdmin(id, updateDto);

@@ -126,19 +126,41 @@ public class ActivityServiceImpl implements ActivityService {
         Activity activityToUpdate = activityRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Atividade com ID " + id + " não encontrada."));
 
-        Ong ong = ongRepository.findById(updateDto.getOngId())
-                .orElseThrow(() -> new IllegalArgumentException("ONG com ID " + updateDto.getOngId() + " não encontrada."));
+        if (updateDto.getTitle() != null) {
+            activityToUpdate.setTitle(updateDto.getTitle());
+        }
+        if (updateDto.getDescription() != null) {
+            activityToUpdate.setDescription(updateDto.getDescription());
+        }
+        if (updateDto.getPointsValue() > 0) { // int não pode ser nulo, então verificamos se um valor válido foi enviado
+            activityToUpdate.setPointsValue(updateDto.getPointsValue());
+        }
+        if (updateDto.getType() != null) {
+            activityToUpdate.setType(updateDto.getType());
+        }
+        if (updateDto.getStatus() != null) {
+            activityToUpdate.setStatus(updateDto.getStatus());
+        }
+        if (updateDto.getStartDate() != null) {
+            activityToUpdate.setStartDate(updateDto.getStartDate());
+        }
+        if (updateDto.getEndDate() != null) {
+            activityToUpdate.setEndDate(updateDto.getEndDate());
+        }
+        if (updateDto.getLocation() != null) {
+            activityToUpdate.setLocation(updateDto.getLocation());
+        }
 
-        // Atualiza a entidade com os dados do DTO
-        activityToUpdate.setTitle(updateDto.getTitle());
-        activityToUpdate.setDescription(updateDto.getDescription());
-        activityToUpdate.setPointsValue(updateDto.getPointsValue());
-        activityToUpdate.setType(updateDto.getType());
-        activityToUpdate.setStatus(updateDto.getStatus());
-        activityToUpdate.setStartDate(updateDto.getStartDate());
-        activityToUpdate.setEndDate(updateDto.getEndDate());
-        activityToUpdate.setLocation(updateDto.getLocation());
-        activityToUpdate.setOng(ong);
+        if (updateDto.getOngId() != null) {
+            // Se foi enviado, verifica se é diferente da ONG já existente na atividade
+            if (!updateDto.getOngId().equals(activityToUpdate.getOng().getId())) {
+                // Se for diferente, busca a nova ONG e atualiza a referência
+                Ong novaOng = ongRepository.findById(updateDto.getOngId())
+                        .orElseThrow(() -> new IllegalArgumentException("ONG com ID " + updateDto.getOngId() + " não encontrada para associação."));
+                activityToUpdate.setOng(novaOng);
+            }
+            // Se o ongId enviado for o mesmo que já está na atividade, não fazemos nada.
+        }
 
         Activity updatedActivity = activityRepository.save(activityToUpdate);
         return ActivityResponseDto.fromEntity(updatedActivity);

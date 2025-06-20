@@ -43,7 +43,7 @@ public class AdminOngController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<?> updateOng(@PathVariable Long id, @RequestBody OngCreateUpdateDto ongDto) {
         try {
             OngDto updatedOng = ongService.updateOng(id, ongDto);

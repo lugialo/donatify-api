@@ -48,7 +48,7 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/me")
+    @PatchMapping("/me")
     public ResponseEntity<?> updateUserProfile(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody UserProfileUpdateDto updateDto) {

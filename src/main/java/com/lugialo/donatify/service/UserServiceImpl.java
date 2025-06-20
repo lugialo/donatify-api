@@ -103,16 +103,24 @@ public class UserServiceImpl implements UserService{
 
     @Transactional
     public UserResponseDto updateUserByAdmin(Long userId, AdminUserUpdateDto updateDto) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Usuário com ID " + userId + " não encontrado."));
+        User userToUpdate = getUserEntityById(userId);
 
-        user.setName(updateDto.getName());
-        user.setNickname(updateDto.getNickname());
-        user.setEmail(updateDto.getEmail());
-        user.setRole(updateDto.getRole());
+        if (updateDto.getName() != null && !updateDto.getName().isEmpty()) {
+            userToUpdate.setName(updateDto.getName());
+        }
+        if (updateDto.getNickname() != null) {
+            userToUpdate.setNickname(updateDto.getNickname());
+        }
+        if (updateDto.getEmail() != null && !updateDto.getEmail().isEmpty()) {
+            userToUpdate.setEmail(updateDto.getEmail());
+        }
+        if (updateDto.getRole() != null) {
+            userToUpdate.setRole(updateDto.getRole());
+        }
 
-        User updatedUser = userRepository.save(user);
-        return UserResponseDto.fromEntity(updatedUser);
+        User savedUser = userRepository.save(userToUpdate);
+
+        return UserResponseDto.fromEntity(savedUser);
     }
 
     @Transactional

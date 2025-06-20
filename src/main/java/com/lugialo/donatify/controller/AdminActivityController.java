@@ -39,7 +39,7 @@ public class AdminActivityController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<?> updateActivity(@PathVariable Long id, @RequestBody ActivityCreateUpdateDto updateDto) {
         try {
             ActivityResponseDto updatedActivity = activityService.updateActivity(id, updateDto);
