@@ -19,5 +19,10 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
     boolean existsByUser_IdAndActivity_Id(Long userId, Long activityId);
 
     List<Enrollment> findByStatus(EnrollmentStatus status);
+    
+    // Busca inscrições de um usuário com um determinado status
+    List<Enrollment> findByUser_IdAndStatus(Long userId, EnrollmentStatus status);
 
+    // Busca todas as inscrições de um usuário
+    List<Enrollment> findByUser_Id(Long userId);
 }

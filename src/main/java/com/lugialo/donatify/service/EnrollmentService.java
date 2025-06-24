@@ -74,6 +74,22 @@ public class EnrollmentService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public List<EnrollmentDetailDto> getUserEnrollments(Long userId, EnrollmentStatus status) {
+        List<Enrollment> enrollments = enrollmentRepository.findByUser_IdAndStatus(userId, status);
+        return enrollments.stream()
+                .map(EnrollmentDetailDto::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<EnrollmentDetailDto> getUserEnrollments(Long userId) {
+        List<Enrollment> enrollments = enrollmentRepository.findByUser_Id(userId);
+        return enrollments.stream()
+                .map(EnrollmentDetailDto::fromEntity)
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public void cancelEnrollmentByAdmin(Long enrollmentId) {
         Enrollment enrollment = enrollmentRepository.findById(enrollmentId)

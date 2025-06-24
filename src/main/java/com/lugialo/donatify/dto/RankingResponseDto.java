@@ -9,12 +9,14 @@ import lombok.Data;
 public class RankingResponseDto {
     private int rank;
     private String name;
+    private String nickname;
     private int totalPoints;
 
     public static RankingResponseDto fromEntity(User user, int rank) {
         return new RankingResponseDto(
                 rank,
                 user.getName(),
+                user.getNickname(),
                 user.getTotalPoints()
         );
     }

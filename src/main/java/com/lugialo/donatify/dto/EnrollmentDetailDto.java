@@ -19,6 +19,7 @@ public class EnrollmentDetailDto {
 
     private Long activityId;
     private String activityTitle;
+    private int pointsValue;
 
     public static EnrollmentDetailDto fromEntity(Enrollment enrollment) {
         EnrollmentDetailDto dto = new EnrollmentDetailDto();
@@ -36,6 +37,7 @@ public class EnrollmentDetailDto {
         if (enrollment.getActivity() != null) {
             dto.setActivityId(enrollment.getActivity().getId());
             dto.setActivityTitle(enrollment.getActivity().getTitle());
+            dto.setPointsValue(enrollment.getActivity().getPointsValue());
         }
 
         return dto;
